@@ -1,0 +1,9 @@
+venv
+.idea
+
+alembic_migration.ini
+
+Dockerfile
+
+.env
+glossy-fastness-433606-m2-fb70dd473734.json
