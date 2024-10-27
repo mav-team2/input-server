@@ -25,6 +25,7 @@ def get_env_tags(tag_list: List[str]) -> dict:
 config = Config(".env")
 
 
+# ENV should be 'local', 'development', or 'production'
 ENV = config("ENV")
 LOG_LEVEL = config("LOG_LEVEL", default='warning') if ENV == 'production' else config("LOG_LEVEL", default='debug')
 
@@ -54,15 +55,14 @@ DATABASE_NAME = config("DATABASE_NAME", default="api")
 DATABASE_PORT = config("DATABASE_PORT", default="3306")
 DATABASE_ENGINE_POOL_SIZE = config("DATABASE_ENGINE_POOL_SIZE", cast=int, default=20)
 DATABASE_ENGINE_MAX_OVERFLOW = config("DATABASE_ENGINE_MAX_OVERFLOW", cast=int, default=0)
-DATABASE_URL = config("DATABASE_URL")
+DATABASE_URL = f"mysql+aiomysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}"
 
 
 # Deal with DB disconnects
 # https://docs.sqlalchemy.org/en/20/core/pooling.html#pool-disconnects
 DATABASE_ENGINE_POOL_PING = config("DATABASE_ENGINE_POOL_PING", default=False)
-SQLALCHEMY_DATABASE_URI = f"mysql+aiomysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}"
-DEV_SQLALCHEMY_DATABASE_URI = config("DEV_SQLALCHEMY_DATABASE_URI", default=SQLALCHEMY_DATABASE_URI)
-LOCAL_DATABASE_URL = config("LOCAL_DATABASE_URL", default=SQLALCHEMY_DATABASE_URI)
+LOCAL_DATABASE_URL = config("LOCAL_DATABASE_URL", default="sqlite+aiosqlite:///./test.db")
+
 # ALEMBIC_CORE_REVISION_PATH = config(
 #     "ALEMBIC_CORE_REVISION_PATH",
 #     default=f"{os.path.dirname(os.path.realpath(__file__))}/database/revisions/core",
@@ -72,9 +72,6 @@ LOCAL_DATABASE_URL = config("LOCAL_DATABASE_URL", default=SQLALCHEMY_DATABASE_UR
 #     default=f"{os.path.dirname(os.path.realpath(__file__))}/database/revisions/tenant",
 # )
 
-# GCP SQL Connection
-GCP_INSTANCE_CONNECTION_NAME = config("GCP_INSTANCE_CONNECTION_NAME")
-GCP_IP_TYPE = config("GCP_IP_TYPE", default="PRIVATE")
 
 ALEMBIC_INI_PATH = config(
     "ALEMBIC_INI_PATH",

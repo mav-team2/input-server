@@ -13,10 +13,11 @@ class Call(Base, TimeStampMixin):
     __tablename__ = "call"
 
     id = Column(Integer, primary_key=True, index=True)
-    uuid = Column(String(36), nullable=False, unique=True, index=True, comment="UUID")
+    # uuid = Column(String(36), nullable=False, unique=True, index=True, comment="UUID")
     # user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    input_prompt = Column(String(1000), nullable=False, comment="입력 프롬프트")
     preset_id = Column(Integer, ForeignKey("presets.id"), nullable=False)
-    prompt = Column(String(1000), nullable=False, comment="입력 프롬프트")
+    prompt = Column(String(1000), nullable=False, comment="생성 프롬프트")
 
     # History와 User, Preset의 관계 설정
     # user = relationship("User", back_populates="call")
@@ -30,8 +31,9 @@ class CallBase(MyBaseModel):
 
 
 class CallCreate(CallBase):
-    prompt: str
+    input_prompt: str
     preset_id: Optional[int] = None
+    prompt : str
 
 
 class CallRead(CallBase):
@@ -40,3 +42,7 @@ class CallRead(CallBase):
     preset: Optional[PresetBase] = None
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
+
+class CallRequset(MyBaseModel):
+    input_prompt: str
+    preset_id: int

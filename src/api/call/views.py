@@ -1,5 +1,5 @@
 import logging
-from typing import List
+import uuid
 
 from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
@@ -7,12 +7,12 @@ from starlette import status
 from src.api.database.core import DbSession
 # from src.api.database.services import CommonParameters, search_filter_sort_paginate
 
-from src.api.call.models import CallRead, CallCreate
+from src.api.call.models import CallRead, CallCreate, CallRequset
 from .services import get, create
 from src.api.presets.services import get as get_preset
 from ..prompt.chatGPT.chatGPTGenerator import OpenAIHandlerDependency
 from ..prompt.services import create_prompt
-from ..queue.rabbitmq_client import RabbitMQClientDependency
+from ..queue.rabbitmq_client import rabbitMQClient
 
 # from ..queue.connection import rabbitMQClient
 
@@ -38,18 +38,23 @@ def get_call(db_session: DbSession, call_id: int):
 
 
 @logic_router.post("/", response_model=CallRead)
-async def call(db_session: DbSession, openai_handler : OpenAIHandlerDependency, rabbitmq_client : RabbitMQClientDependency, call_in: CallCreate):
+async def _(db_session: DbSession, openai_handler: OpenAIHandlerDependency, call_in: CallRequset):
     #get preset
     preset = await get_preset(db_session=db_session, preset_id=call_in.preset_id)
 
     # get prompt
-    prompt = await create_prompt(call_in.prompt, preset.assistant_id, openai_handler)
+    prompt = await create_prompt(call_in.input_prompt, preset.assistant_id, openai_handler)
 
     # create call
-    call = await create(db_session=db_session, call_in=call_in)
+    call_create: CallCreate = CallCreate(
+        preset_id=preset.id,
+        input_prompt=call_in.input_prompt,
+        prompt=prompt
+    )
+    call = await create(db_session=db_session, call_in=call_create)
 
     # add to queue
-    await rabbitmq_client.publish({"call_data_id": call.id})
+    await rabbitMQClient.publish({"call_data_id": call.id})
 
     # return
     return call

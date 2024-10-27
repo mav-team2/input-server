@@ -9,10 +9,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessi
     async_scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, declared_attr
-from google.cloud.sql.connector import Connector, IPTypes
-# import pymysql
-import aiomysql
-from starlette.requests import Request
 
 from src.api import config
 from src.api.database.exceptions import NotFoundError

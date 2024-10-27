@@ -15,15 +15,6 @@ async def get(*, db_session: DbSession, call_id: int) -> Optional[Call]:
     # return db_session.query(Call).options(joinedload(Call.preset)).filter(Call.id == call_id).one_or_none()
     return (await db_session.execute(select(Call).join(Call.preset).where(Call.id == call_id))).scalar_one_or_none()
 
-def get_is_done(*, db_session: Session, call_id: int) -> Optional[bool]:
-    call = get(db_session=db_session, call_id=call_id)
-
-    if call:
-        if call.result_url is None:
-            return False
-        else:
-            return True
-
 
 async def get_all(*, db_session: DbSession) -> Query[Type[Call]]:
     return (await db_session.execute(select(Call))).scalars().all()

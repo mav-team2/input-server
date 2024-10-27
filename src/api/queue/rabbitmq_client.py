@@ -162,15 +162,4 @@ class RabbitClient:
             await self.connection.close()
 
 
-async def get_rabbitmq_client() -> RabbitClient:
-    """ Get a RabbitMQ client instance. """
-    client = RabbitClient(rabbit_url=config.RABBITMQ_URL, exchange=config.RABBITMQ_EXCHANGE, service=config.RABBITMQ_QUEUE)
-    await client.start()
-
-    try:
-        yield client
-    finally:
-        await client.stop()
-
-
-RabbitMQClientDependency = Annotation[RabbitClient, Depends(get_rabbitmq_client)]
+rabbitMQClient = RabbitClient(config.RABBITMQ_URL, config.RABBITMQ_EXCHANGE, config.RABBITMQ_QUEUE)

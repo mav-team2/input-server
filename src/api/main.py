@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from typing import Final, Optional, Union, Any
 from uuid import uuid1
@@ -17,7 +18,7 @@ from starlette.routing import compile_path
 from src.api.router import api_router
 from .database.core import engine
 from .log import configure_logging
-
+from .queue.rabbitmq_client import RabbitClient, rabbitMQClient
 
 log = logging.getLogger(__name__)
 
@@ -57,12 +58,27 @@ app = FastAPI(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        await rabbitMQClient.start()
+        yield
+
+    except BaseException as e:
+        log.error("Error connecting rabbitmq: %s", e)
+
+    finally:
+        if rabbitMQClient.is_connected:
+            await rabbitMQClient.stop()
+
 api = FastAPI(
     title="Input API for Diffusion Image Models",
     description="This API is used to send images to the Diffusion Image Models.",
     root_path="/api",
     openapi_url="/docs/openapi.json",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 
@@ -84,29 +100,6 @@ _request_id_ctx_var: ContextVar[Optional[str]] = ContextVar(REQUEST_ID_CTX_KEY, 
 def get_request_id() -> Optional[str]:
     return _request_id_ctx_var.get()
 
-
-# @api.middleware("http")
-# async def db_session_middleware(request: Request, call_next):
-#     request_id = str(uuid1())
-#
-#     # we create a per-request id such that we can ensure that our session is scoped for a particular request.
-#     # see: https://github.com/tiangolo/fastapi/issues/726
-#     ctx_token = _request_id_ctx_var.set(request_id)
-#
-#     try:
-#         # session = async_scoped_session(async_sessionmaker(bind=engine), scopefunc=asyncio.current_task)
-#         session = async_scoped_session(async_sessionmaker(bind=engine), scopefunc=get_request_id)
-#         request.state.db = session()
-#         log.info("current session: %s", request.state.db)
-#         response = await call_next(request)
-#     except Exception as e:
-#         raise e from None
-#     finally:
-#         await request.state.db.close()
-#
-#     await session.remove()
-#     _request_id_ctx_var.reset(ctx_token)
-#     return response
 
 api.include_router(api_router)
 
