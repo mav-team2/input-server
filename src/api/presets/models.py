@@ -30,7 +30,7 @@ class Preset(Base, TimeStampMixin):
     # thread_id_id: Mapped[int] = mapped_column(ForeignKey("thread_id.id"), nullable=True, comment="Thread ID for chatGPT api")
 
     calls = relationship("Call", back_populates="preset")
-    # assistant_id = relationship("AssistantId", back_populates="presets")
+    assistant_id = relationship("AssistantId", back_populates="presets", lazy="joined")
     # thread_id = relationship("ThreadId", back_populates="preset")
 
 

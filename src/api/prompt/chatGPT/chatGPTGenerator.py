@@ -33,13 +33,13 @@ class ChatGPTHandler:
         return assistant
 
     async def retrieve_assistant(self, assistant_id: str):
-        return self.client.beta.assistants.retrieve(assistant_id)
+        return await self.client.beta.assistants.retrieve(assistant_id)
 
     async def retrieve_thread(self, thread_id: str):
-        return self.client.beta.threads.retrieve(thread_id)
+        return await self.client.beta.threads.retrieve(thread_id)
 
-    async def create_thread(self):
-        return self.client.beta.threads.create()
+    async def create_thread(self) :
+        return await self.client.beta.threads.create()
 
     async def create_thread_with_messages(self, prompt: str):
         message = {
@@ -47,23 +47,23 @@ class ChatGPTHandler:
             "content": prompt
         }
 
-        return self.client.beta.threads.create(messages=[message])
+        return await self.client.beta.threads.create(messages=[message])
 
     async def remove_thread(self, thread_id: str):
-        return self.client.beta.threads.delete(thread_id)
+        return await self.client.beta.threads.delete(thread_id)
 
     async def create_message(self, prompt: str, thread_id: Optional[str] = None):
-        return self.client.beta.threads.messages.create(
+        return await  self.client.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
             content=prompt
         )
 
     async def list_messages(self, thread_id: str):
-        return self.client.beta.threads.messages.list(thread_id=thread_id)
+        return await self.client.beta.threads.messages.list(thread_id=thread_id)
 
     async def create_run(self, thread_id: str, assistant_id: str, **kwargs):
-        return self.client.beta.threads.runs.create(
+        return await self.client.beta.threads.runs.create(
             thread_id=thread_id,
             assistant_id=assistant_id,
             **kwargs

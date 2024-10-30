@@ -15,7 +15,7 @@ class AssistantId(Base, TimeStampMixin):
     assistant_id : Mapped[str] = mapped_column(String(100), nullable=False, index=True, comment="Assistant ID for chatGPT api")
     description : Mapped[str] = mapped_column(String(500), nullable=True)
 
-    # presets = relationship("Preset", back_populates="assistant_id")
+    presets = relationship("Preset", back_populates="assistant_id")
 
 
 class AssistantIdBase(MyBaseModel):

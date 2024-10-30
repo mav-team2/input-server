@@ -1,24 +1,19 @@
-import asyncio
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from typing import Final, Optional, Union, Any
-from uuid import uuid1
-
 from fastapi import FastAPI, status
+
 import logging
 
 from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import async_sessionmaker, async_scoped_session, AsyncSession
-from sqlalchemy.orm import scoped_session, sessionmaker
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
 from starlette.routing import compile_path
 
 from src.api.router import api_router
-from .database.core import engine
 from .log import configure_logging
-from .queue.rabbitmq_client import RabbitClient, rabbitMQClient
+from .queue.rabbitmq_client import rabbitMQClient
 
 log = logging.getLogger(__name__)
 

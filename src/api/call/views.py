@@ -29,21 +29,21 @@ log = logging.getLogger(__name__)
 
 
 @router.get("/{call_id}", response_model=CallRead)
-def get_call(db_session: DbSession, call_id: int):
-    call_ = get(db_session=db_session, call_id=call_id)
+async def get_call(db_session: DbSession, call_id: int):
+    call_ = await get(db_session=db_session, call_id=call_id)
     if not call_:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "Call not found"})
 
     return call_
 
 
-@logic_router.post("/", response_model=CallRead)
-async def _(db_session: DbSession, openai_handler: OpenAIHandlerDependency, call_in: CallRequset):
+@logic_router.post("/call", response_model=CallRead)
+async def _call(db_session: DbSession, openai_handler: OpenAIHandlerDependency, call_in: CallRequset):
     #get preset
     preset = await get_preset(db_session=db_session, preset_id=call_in.preset_id)
-
+    log.debug(preset.assistant_id)
     # get prompt
-    prompt = await create_prompt(call_in.input_prompt, preset.assistant_id, openai_handler)
+    prompt = await create_prompt(call_in.input_prompt, preset.assistant_id.assistant_id, openai_handler)
 
     # create call
     call_create: CallCreate = CallCreate(

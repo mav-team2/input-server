@@ -4,6 +4,7 @@ from typing import Optional, Type, Sequence
 from fastapi import HTTPException
 from sqlalchemy import select, update as _update, delete as _delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from starlette import status
 
 from src.api.database.core import DbSession
@@ -12,8 +13,9 @@ from src.api.presets.models import Preset, PresetCreate, PresetUpdate
 log = logging.getLogger(__name__)
 
 
-async def get(db_session: DbSession, preset_id: int) -> Optional[Preset]:
+async def get(db_session: AsyncSession, preset_id: int) -> Optional[Preset]:
     return await db_session.get(Preset, preset_id)
+    # return (await db_session.execute(select(Preset).where(Preset.id == preset_id).options(selectinload(Preset.assistant_id)))).scalar()
 
 
 async def get_all(db_session: DbSession) -> Sequence[Preset]:

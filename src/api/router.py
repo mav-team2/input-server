@@ -4,8 +4,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
-from src.api.call.views import router as call_route
-from src.api.presets.views import router as preset_route
+from src.api.presets.views import router as presets_router
+from src.api.call.views import router as calls_router, logic_router as calls_logic_router
 
 
 class ErrorMessage(BaseModel):
@@ -33,5 +33,6 @@ def healthcheck():
     return {"status": "ok"}
 
 
-api_router.include_router(call_route, prefix="/call", tags=["call"])
-api_router.include_router(preset_route, prefix="/presets", tags=["presets"])
+api_router.include_router(calls_router, prefix="/call", tags=["calls"])
+api_router.include_router(calls_logic_router, tags=["call"])
+api_router.include_router(presets_router, prefix="/presets", tags=["presets"])
