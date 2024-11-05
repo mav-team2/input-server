@@ -32,7 +32,7 @@ class MyBaseModel(BaseModel):
         json_encoders = {
             # custom output conversion for datetime
             datetime: lambda v: v.strftime("%Y-%m-%dT%H:%M:%S.%fZ") if v else None,
-            # SecretStr: lambda v: v.get_secret_value() if v else None,
+            SecretStr: lambda v: v.get_secret_value() if v else None,
         }
 
 

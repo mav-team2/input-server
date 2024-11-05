@@ -26,14 +26,12 @@ class Call(Base, TimeStampMixin):
 
 
 class CallBase(MyBaseModel):
-    # user_id: int
-    pass
+    preset_id: int
+    input_prompt: str
 
 
 class CallCreate(CallBase):
-    input_prompt: str
-    preset_id: Optional[int] = None
-    prompt : str
+    prompt : Optional[str] = None
 
 
 class CallRead(CallBase):
@@ -45,6 +43,5 @@ class CallRead(CallBase):
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
-class CallRequset(MyBaseModel):
-    input_prompt: str
-    preset_id: int
+class CallRequset(CallBase):
+    pass

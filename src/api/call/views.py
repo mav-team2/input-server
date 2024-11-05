@@ -56,9 +56,10 @@ async def _call(db_session: DbSession, openai_handler: OpenAIHandlerDependency, 
         )
 
         call = await create(db_session=db_session, call_in=call_create)
+        data = CallRead.model_validate(call)
 
         # add to queue
-        await rabbitMQClient.publish_message(config.RABBITMQ_ROUTING_KEY, {"call_data_id": call.id})
+        await rabbitMQClient.publish_message(config.RABBITMQ_ROUTING_KEY, data.model_dump_json(exclude=["created_at", "updated_at"]))
 
         return call
     except Exception as e:

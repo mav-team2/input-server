@@ -22,9 +22,6 @@ async def get_all(*, db_session: DbSession) -> Query[Type[Call]]:
 
 async def create(*, db_session: DbSession, call_in: CallCreate) -> Call:
     """Creates a new user."""
-    # user = user_service.get_by_id(db_session=db_session, user_id=history_in.user_id)
-    # add preset_id
-
     # call = Call(**call_in.model_dump(exclude={"user_id"}), user=user)
     call = Call(**call_in.model_dump())
     db_session.add(call)
