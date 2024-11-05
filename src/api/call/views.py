@@ -10,6 +10,7 @@ from src.api.database.core import DbSession
 from src.api.call.models import CallRead, CallCreate, CallRequset
 from .services import get, create
 from src.api.presets.services import get as get_preset
+from src.api import config
 from ..prompt.chatGPT.chatGPTGenerator import OpenAIHandlerDependency
 from ..prompt.services import create_prompt
 from ..queue.rabbitmq_client import rabbitMQClient
@@ -39,22 +40,27 @@ async def get_call(db_session: DbSession, call_id: int):
 
 @logic_router.post("/call", response_model=CallRead)
 async def _call(db_session: DbSession, openai_handler: OpenAIHandlerDependency, call_in: CallRequset):
-    #get preset
-    preset = await get_preset(db_session=db_session, preset_id=call_in.preset_id)
-    log.debug(preset.assistant_id)
-    # get prompt
-    prompt = await create_prompt(call_in.input_prompt, preset.assistant_id.assistant_id, openai_handler)
+    try:
+        #get preset
+        preset = await get_preset(db_session=db_session, preset_id=call_in.preset_id)
 
-    # create call
-    call_create: CallCreate = CallCreate(
-        preset_id=preset.id,
-        input_prompt=call_in.input_prompt,
-        prompt=prompt
-    )
-    call = await create(db_session=db_session, call_in=call_create)
+        # get prompt
+        # prompt = await create_prompt(call_in.input_prompt, preset.assistant_id.assistant_id, openai_handler)
+        prompt = "Test prompt"
 
-    # add to queue
-    await rabbitMQClient.publish({"call_data_id": call.id})
+        # create call
+        call_create: CallCreate = CallCreate(
+            preset_id=preset.id,
+            input_prompt=call_in.input_prompt,
+            prompt=prompt
+        )
 
-    # return
-    return call
+        call = await create(db_session=db_session, call_in=call_create)
+
+        # add to queue
+        await rabbitMQClient.publish_message(config.RABBITMQ_ROUTING_KEY, {"call_data_id": call.id})
+
+        return call
+    except Exception as e:
+        log.error("Error creating call: %s", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg": "Internal Server Error"})

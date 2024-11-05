@@ -14,8 +14,7 @@ log = logging.getLogger(__name__)
 
 
 async def get(db_session: AsyncSession, preset_id: int) -> Optional[Preset]:
-    return await db_session.get(Preset, preset_id)
-    # return (await db_session.execute(select(Preset).where(Preset.id == preset_id).options(selectinload(Preset.assistant_id)))).scalar()
+    return (await db_session.execute(select(Preset).where(Preset.id == preset_id).options(selectinload(Preset.assistant_id)))).scalar()
 
 
 async def get_all(db_session: DbSession) -> Sequence[Preset]:

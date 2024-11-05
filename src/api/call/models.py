@@ -37,9 +37,11 @@ class CallCreate(CallBase):
 
 
 class CallRead(CallBase):
-    id: Optional[str]
+    id: int
     preset_id: int
-    preset: Optional[PresetBase] = None
+    input_prompt: str
+    prompt : Optional[str] = None
+    # preset: Optional[PresetBase] = None
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 

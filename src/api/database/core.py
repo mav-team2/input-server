@@ -147,7 +147,7 @@ else:
 
 async def get_db() -> AsyncSession:
     session = async_scoped_session(async_sessionmaker(bind=engine), scopefunc=asyncio.current_task)
-    log.debug("current session: %s", session)
+    # log.debug("current session: %s", session)
 
     try:
         yield session

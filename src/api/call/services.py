@@ -27,8 +27,9 @@ async def create(*, db_session: DbSession, call_in: CallCreate) -> Call:
 
     # call = Call(**call_in.model_dump(exclude={"user_id"}), user=user)
     call = Call(**call_in.model_dump())
-    await db_session.add(call)
+    db_session.add(call)
     await db_session.commit()
+    await db_session.refresh(call)
     return call
 
 

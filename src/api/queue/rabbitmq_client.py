@@ -13,6 +13,7 @@ VERSION INFO::
 
 # BUILTIN modules
 import asyncio
+import logging
 from typing import Callable, Optional, Any
 
 # Third party modules
@@ -25,6 +26,7 @@ from openai.types.beta.threads import Annotation
 
 from src.api import config
 
+log = logging.getLogger(__name__)
 
 # -----------------------------------------------------------------------------
 #
@@ -113,18 +115,18 @@ class RabbitClient:
 
     # ---------------------------------------------------------
     #
-    async def start_subscription(self):
-        """ Setup message listener with the current running asyncio loop. """
-
-        # Creating a receive queue.
-        queue = await self.channel.declare_queue(name=self.service_name, durable=True)
-
-        # Start consuming existing and future messages.
-        await queue.consume(self._process_incoming_message, no_ack=False)
+    # async def start_subscription(self):
+    #     """ Setup message listener with the current running asyncio loop. """
+    #
+    #     # Creating a receive queue.
+    #     queue = await self.channel.declare_queue(name=self.service_name, durable=True)
+    #
+    #     # Start consuming existing and future messages.
+    #     await queue.consume(self._process_incoming_message, no_ack=False)
 
     # ---------------------------------------------------------
     #
-    async def publish_message(self, queue: str, message: dict):
+    async def publish_message(self, routing_key: str, message: dict):
         """ Publish a message on specified RabbitMQ queue asynchronously.
 
         :param queue: Publishing queue.
@@ -137,9 +139,10 @@ class RabbitClient:
         # Create a message and publish it.
         message_body = Message(
             content_type='application/json',
+            content_encoding='utf-8',
             delivery_mode=DeliveryMode.PERSISTENT,
             body=json.dumps(message, ensure_ascii=False).encode())
-        await exchange.publish(routing_key=queue, message=message_body)
+        await exchange.publish(routing_key=routing_key, message=message_body)
 
     # ---------------------------------------------------------
     #

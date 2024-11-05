@@ -47,15 +47,10 @@ async def not_found(request, exc):
     )
 
 
-app = FastAPI(
-    exception_handlers={404: not_found},
-)
-app.add_middleware(GZipMiddleware, minimum_size=1000)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    log.warn("Starting rabbitmq connection")
     try:
         await rabbitMQClient.start()
         yield
@@ -67,14 +62,18 @@ async def lifespan(app: FastAPI):
         if rabbitMQClient.is_connected:
             await rabbitMQClient.stop()
 
-api = FastAPI(
+app = FastAPI(
     title="Input API for Diffusion Image Models",
     description="This API is used to send images to the Diffusion Image Models.",
     root_path="/api",
     openapi_url="/docs/openapi.json",
     redoc_url="/redoc",
     lifespan=lifespan,
+    exception_handlers={404: not_found},
 )
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 
 def get_path_params_from_request(request: Request) -> Union[dict[Any, Any], dict[str, Union[str, Any]]]:
@@ -96,6 +95,4 @@ def get_request_id() -> Optional[str]:
     return _request_id_ctx_var.get()
 
 
-api.include_router(api_router)
-
-app.mount("/api", app=api)
+app.include_router(api_router)
