@@ -45,8 +45,7 @@ async def _call(db_session: DbSession, openai_handler: OpenAIHandlerDependency, 
         preset = await get_preset(db_session=db_session, preset_id=call_in.preset_id)
 
         # get prompt
-        # prompt = await create_prompt(call_in.input_prompt, preset.assistant_id.assistant_id, openai_handler)
-        prompt = "Test prompt"
+        prompt = await create_prompt(call_in.input_prompt, preset.assistant_id.assistant_id, openai_handler)
 
         # create call
         call_create: CallCreate = CallCreate(
@@ -64,4 +63,4 @@ async def _call(db_session: DbSession, openai_handler: OpenAIHandlerDependency, 
         return call
     except Exception as e:
         log.error("Error creating call: %s", e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg": "Internal Server Error"})
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg": "Internal Server Error", "error": str(e)})

@@ -8,6 +8,12 @@ from ..database.core import DbSession
 log = logging.getLogger(__name__)
 
 
+class OPENAIError(Exception):
+    def __init__(self, message):
+        self.message = f"open ai error : {message}"
+        super().__init__(message)
+
+
 async def create_prompt(prompt: str, assistant_id: str, handler: ChatGPTHandler):
     try:
         assistant = await handler.retrieve_assistant(assistant_id)
@@ -24,8 +30,8 @@ async def create_prompt(prompt: str, assistant_id: str, handler: ChatGPTHandler)
         response = messages.data[0].content[0].text.value
         return response
     except Exception as e:
-        print(f"Error: {e}")
-        return None
+        log.error(f"OPENAI Error: {e}")
+        raise OPENAIError(e)
     finally:
         await handler.remove_thread(thread.id)
         log.info("Thread removed")
