@@ -75,7 +75,7 @@ async def lifespan(app: FastAPI):
 # we create the ASGI for the frontend
 frontend = FastAPI(openapi_url="")
 frontend.add_middleware(GZipMiddleware, minimum_size=1000)
-STATIC_DIR = "/src/frontend/conskku_front/dist"
+STATIC_DIR = "./src/frontend/conskku_front/dist"
 
 @frontend.middleware("http")
 async def default_page(request, call_next):
