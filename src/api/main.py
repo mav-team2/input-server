@@ -49,15 +49,6 @@ async def not_found(request, exc):
         status_code=status.HTTP_404_NOT_FOUND, content={"detail": [{"msg": "Not Found."}]}
     )
 
-app = FastAPI(
-    title="Input API for Diffusion Image Models",
-    exception_handlers={404: not_found},
-)
-
-app.add_middleware(GZipMiddleware, minimum_size=1000)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.warn("Starting rabbitmq connection")
@@ -71,6 +62,17 @@ async def lifespan(app: FastAPI):
     finally:
         if rabbitMQClient.is_connected:
             await rabbitMQClient.stop()
+
+app = FastAPI(
+    title="Input API for Diffusion Image Models",
+    exception_handlers={404: not_found},
+    lifespan=lifespan
+)
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+
 
 # we create the ASGI for the frontend
 frontend = FastAPI(openapi_url="")
@@ -90,7 +92,6 @@ api = FastAPI(
     description="This API is used to send images to the Diffusion Image Models.",
     openapi_url="/docs/openapi.json",
     redoc_url="/redoc",
-    lifespan=lifespan,
 )
 api.add_middleware(GZipMiddleware, minimum_size=1000)
 
