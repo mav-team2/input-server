@@ -1,0 +1,3 @@
+[submodule "src/frontend/conskku_front"]
+	path = src/frontend/conskku_front
+	url = https://github.com/mav-team2/conskku_front.git
