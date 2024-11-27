@@ -11,8 +11,6 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
 from starlette.routing import compile_path
-from starlette.staticfiles import StaticFiles
-from starlette.responses import FileResponse
 
 from src.api.router import api_router
 from .log import configure_logging
@@ -23,7 +21,6 @@ log = logging.getLogger(__name__)
 # we configure the logging level and format
 configure_logging()
 log.warn("current log level: %s", logging.getLogger().getEffectiveLevel())
-
 
 """
 로컬 서버에서 최대한 많은 기능을 덜어낸다.
@@ -49,6 +46,7 @@ async def not_found(request, exc):
         status_code=status.HTTP_404_NOT_FOUND, content={"detail": [{"msg": "Not Found."}]}
     )
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.warn("Starting rabbitmq connection")
@@ -63,38 +61,19 @@ async def lifespan(app: FastAPI):
         if rabbitMQClient.is_connected:
             await rabbitMQClient.stop()
 
+
 app = FastAPI(
     title="Input API for Diffusion Image Models",
+    description="This API is used to send images to the Diffusion Image Models.",
+    openapi_url="/docs/openapi.json",
+    redoc_url="/redoc",
     exception_handlers={404: not_found},
     lifespan=lifespan
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-
-
-
-# we create the ASGI for the frontend
-frontend = FastAPI(openapi_url="")
-frontend.add_middleware(GZipMiddleware, minimum_size=1000)
-STATIC_DIR = "./src/frontend/conskku_front/dist"
-
-@frontend.middleware("http")
-async def default_page(request, call_next):
-    response = await call_next(request)
-    if response.status_code == 404:
-        if STATIC_DIR:
-            return FileResponse(os.path.join(STATIC_DIR, "index.html"))
-    return response
-
-api = FastAPI(
-    title="Input API for Diffusion Image Models",
-    description="This API is used to send images to the Diffusion Image Models.",
-    openapi_url="/docs/openapi.json",
-    redoc_url="/redoc",
-)
-api.add_middleware(GZipMiddleware, minimum_size=1000)
-
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
+                   allow_headers=["*"])
 
 
 def get_path_params_from_request(request: Request) -> Union[dict[Any, Any], dict[str, Union[str, Any]]]:
@@ -116,10 +95,5 @@ def get_request_id() -> Optional[str]:
     return _request_id_ctx_var.get()
 
 
-# we mount the frontend and app
-if STATIC_DIR and os.path.isdir(STATIC_DIR):
-    frontend.mount("/", StaticFiles(directory=STATIC_DIR), name="app")
-api.include_router(api_router)
+app.include_router(api_router, prefix="/api")
 
-app.mount("/api", app=api)
-app.mount("/", frontend)
