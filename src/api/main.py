@@ -49,7 +49,7 @@ async def not_found(request, exc):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    log.warn("Starting rabbitmq connection")
+    log.debug("Starting rabbitmq connection")
     try:
         await rabbitMQClient.start()
         yield
