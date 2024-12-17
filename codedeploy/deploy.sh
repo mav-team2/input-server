@@ -1,0 +1,1 @@
+systemtctl restart gunicorn.service

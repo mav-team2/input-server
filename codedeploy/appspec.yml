@@ -1,0 +1,15 @@
+version: 0.1
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu
+permissions:
+  - object: /
+    pattern: "**"
+    owner: ubuntu
+    group: www-data
+hooks:
+  ApplicationStart:
+    - location: deploy.sh
+      timeout: 300
+      runas: ec2-ubuntu
