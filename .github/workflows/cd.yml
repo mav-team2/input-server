@@ -53,12 +53,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Update environment paths
-        run: |
-          echo "${{ github.workspace }}/venv/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=${{ github.workspace }}/venv" >> $GITHUB_ENV
-          
-
       - name: Save virtual environment cache
         if: steps.cache-venv.outputs.cache-hit != 'true'
         uses: actions/cache@v3
@@ -68,7 +62,7 @@ jobs:
 
 
       - name: Create Zipfile archive of Dependencies
-        run: zip -r9 ${PROJECT_NAME}.zip venv
+        run: zip -r9 ${PROJECT_NAME}.zip venv -x "venv/lib/python3.10/site-packages/pip/*"
 
       - name: Add App to Zipfile
         run: |
