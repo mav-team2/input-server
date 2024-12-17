@@ -72,8 +72,9 @@ jobs:
 
       - name: Add App to Zipfile
         run: |
-          zip -g ../${PROJECT_NAME}.zip -r ./src
-          cd ./codedeploy && zip -g ../${PROJECT_NAME}.zip -r .
+          pwd
+          zip -g ${PROJECT_NAME}.zip -r ./src
+          cd ./codedeploy && zip -g ${PROJECT_NAME}.zip -r .
 
       - name: 🌎 Access to AWS
         uses: aws-actions/configure-aws-credentials@v4
