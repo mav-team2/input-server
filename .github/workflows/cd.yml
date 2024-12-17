@@ -19,6 +19,8 @@ env:  # 전역 변수 선언
 
 jobs:
   build:
+    env:
+      ENV_PATH: .env
     environment: production
 
     runs-on: ubuntu-latest
@@ -87,21 +89,6 @@ jobs:
           --acl private \
           ./${PROJECT_NAME}.zip \
           s3://${{ secrets.S3_BUCKET_NAME }}/${{ secrets.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip
-
-  deploy:
-    env:
-      ENV_PATH: .env
-    environment: production
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 🌎 Access to AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
 
       - name: 🚀 Deploy to EC2
         run: |
