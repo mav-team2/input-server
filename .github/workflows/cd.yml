@@ -88,13 +88,13 @@ jobs:
           --region ap-northeast-2 \
           --acl private \
           ./${PROJECT_NAME}.zip \
-          s3://${{ secrets.S3_BUCKET_NAME }}/${{ env.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip
+          s3://${{ secrets.S3_BUCKET_NAME }}/${{ secrets.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip
 
       - name: 🚀 Deploy to EC2
         run: |
           aws deploy create-deployment \
           --application-name ${PROJECT_NAME} \
           --deployment-group-name production \
-          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=${{ env.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip \
+          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=${{ secrets.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --region ap-northeast-2
