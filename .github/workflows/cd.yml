@@ -68,14 +68,12 @@ jobs:
 
 
       - name: Create Zipfile archive of Dependencies
-        run: |
-          cd ./venv/lib/python3.10/site-packages
-          zip -r9 ../../../../${PROJECT_NAME}.zip .
+        run: zip -r9 ${PROJECT_NAME}.zip venv
 
       - name: Add App to Zipfile
         run: |
-          cd ./src && zip -g ../${PROJECT_NAME}.zip -r .
-          cd ../codedeploy && zip -g ../${PROJECT_NAME}.zip -r .
+          zip -g ../${PROJECT_NAME}.zip -r ./src
+          cd ./codedeploy && zip -g ../${PROJECT_NAME}.zip -r .
 
       - name: 🌎 Access to AWS
         uses: aws-actions/configure-aws-credentials@v4
