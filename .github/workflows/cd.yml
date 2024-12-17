@@ -1,0 +1,72 @@
+name: 🚀 Deploy to production
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+env:  # 전역 변수 선언
+  PROJECT_NAME: input-server
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python all python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          architecture: x64
+
+      - name:  Setup Virtual env
+        uses: actions/cache/restore@v4
+        id: cache-venv
+        with:
+          path: venv
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install -r requirements.txt
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+      - name: Saved cached virtualenv
+        uses: actions/cache/save@v4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+          path: venv
+
+      - name: Create Zipfile archive of Dependencies
+        run: |
+          cd ./venv/lib/python3.10/site-packages
+          zip -r9 ../../../../${PROJECT_NAME}.zip .
+
+      - name: Add App to Zipfile
+        run: cd ./src && zip -g ../${PROJECT_NAME}.zip -r .
+
+      - name: Upload to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 cp \
+          --region ap-northeast-2 \
+          --acl private \
+          ./${PROJECT_NAME}.zip \
+          s3://input-server/build/$/${PROJECT_NAME}.zip  \
