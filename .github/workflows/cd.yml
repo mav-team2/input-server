@@ -6,9 +6,7 @@ on:
       - main
     types:
       - closed
-  push:
-    branches:
-      - main
+
 
 permissions:
   contents: read
@@ -53,7 +51,7 @@ jobs:
 
       - name: Save virtual environment cache
         if: steps.cache-venv.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
+        uses: actions/cache/save@v4
         with:
           path: venv
           key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
@@ -63,7 +61,7 @@ jobs:
     needs: ci
     environment: production
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Create .env file
