@@ -72,7 +72,7 @@ jobs:
 #          echo SOCKET_PORT_TEST=${{ secrets.SOCKET_PORT_TEST }} >> ${{ env.ENV_PATH }}
 
       - name: Add App to Zipfile
-        run: zip -g ${PROJECT_NAME}.zip -r ./src ./scripts requirements.txt appspec.yml
+        run: zip ${PROJECT_NAME}.zip -r ./src ./scripts requirements.txt appspec.yml
 
       - name: 🌎 Access to AWS
         uses: aws-actions/configure-aws-credentials@v4
