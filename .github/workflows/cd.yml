@@ -63,7 +63,7 @@ jobs:
     needs: ci
     environment: production
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Create .env file
