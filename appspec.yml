@@ -9,10 +9,11 @@ files:
 file_exists_behavior: OVERWRITE
 
 permissions:
-  - object: /
+  - object: /home/ubuntu/scripts
     pattern: "**"
     owner: ubuntu
     group: www-data
+    mode: 755
 
 hooks:
   AfterInstall:
