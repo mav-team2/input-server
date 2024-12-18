@@ -15,12 +15,10 @@ permissions:
 
 env:  # 전역 변수 선언
   PROJECT_NAME: input-server
-
+  ENV_PATH: .env
 
 jobs:
-  build:
-    env:
-      ENV_PATH: .env
+  ci:
     environment: production
 
     runs-on: ubuntu-latest
@@ -61,14 +59,25 @@ jobs:
           key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
 
 
+  cd:
+    needs: ci
+    environment: production
+
+    runs-on: self-hosted
+
+    steps:
+      - name: Create .env file
+        run: |
+          touch ${{ env.ENV_PATH }}
+#          echo DOMAIN_FIR=${{ secrets.DOMAIN_FIR }} >> ${{ env.ENV_PATH }}
+#          echo SOCKET_PORT_PROD=${{ secrets.SOCKET_PORT_PROD }} >> ${{ env.ENV_PATH }}
+#          echo SOCKET_PORT_TEST=${{ secrets.SOCKET_PORT_TEST }} >> ${{ env.ENV_PATH }}
+
       - name: Create Zipfile archive of Dependencies
         run: zip -r9 ${PROJECT_NAME}.zip venv -x "venv/lib/python3.10/site-packages/pip/*"
 
       - name: Add App to Zipfile
-        run: |
-          pwd
-          zip -g ${PROJECT_NAME}.zip -r ./src
-          cd ./codedeploy && zip -g ../${PROJECT_NAME}.zip -r .  
+        run: zip -g ${PROJECT_NAME}.zip -r ./src ./scripts requirements.txt appspec.yml
 
       - name: 🌎 Access to AWS
         uses: aws-actions/configure-aws-credentials@v4

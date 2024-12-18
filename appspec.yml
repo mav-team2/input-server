@@ -1,0 +1,26 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/input-server
+  - source: /venv
+    destination: /home/ubuntu/venv
+file_exists_behavior: OVERWRITE
+
+permissions:
+  - object: /
+    pattern: "**"
+    owner: ubuntu
+    group: www-data
+
+hooks:
+  AfterInstall:
+    - location: scripts/init.sh
+      timeout: 300
+      runas: ubuntu
+
+  ApplicationStart:
+    - location: scripts/deploy.sh
+      timeout: 300
+      runas: ubuntu
