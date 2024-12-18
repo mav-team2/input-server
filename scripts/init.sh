@@ -7,7 +7,7 @@ echo "Init script started at $(date)" >> $LOG_FILE
 
 # 가상 환경 생성 및 활성화
 echo "Creating virtual environment..." >> $LOG_FILE
-python -m venv /home/ubuntu/venv >> $LOG_FILE 2>&1
+python3 -m venv /home/ubuntu/venv >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
     echo "Error creating virtual environment" >> $LOG_FILE
     exit 1
