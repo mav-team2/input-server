@@ -71,9 +71,6 @@ jobs:
 #          echo SOCKET_PORT_PROD=${{ secrets.SOCKET_PORT_PROD }} >> ${{ env.ENV_PATH }}
 #          echo SOCKET_PORT_TEST=${{ secrets.SOCKET_PORT_TEST }} >> ${{ env.ENV_PATH }}
 
-      - name: Create Zipfile archive of Dependencies
-        run: zip -r9 ${PROJECT_NAME}.zip venv -x "venv/lib/python3.10/site-packages/pip/*"
-
       - name: Add App to Zipfile
         run: zip -g ${PROJECT_NAME}.zip -r ./src ./scripts requirements.txt appspec.yml
 
