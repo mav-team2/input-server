@@ -1,11 +1,8 @@
 # python
-import asyncio
-
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks
-from fastapi.websockets import WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, status
 from typing import List
 
-from src.api.core.dependency import DbSession, RequestId
+from src.api.database.core import DbSession
 from src.api.generation_setting.models import (
     GenerationSettingCreate,
     GenerationSettingUpdate,
@@ -19,8 +16,6 @@ from src.api.generation_setting.services import (
     update,
     delete
 )
-from src.api.generation_setting.tasks import generate_image_task
-from src.api.ws.ws_manager import ws_manager
 
 router = APIRouter()
 
@@ -63,10 +58,3 @@ async def delete_generation_setting(generation_setting_id: int, db_session: DbSe
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Generation setting not found")
     await delete(db_session, setting)
     return {"detail": "Generation setting deleted"}
-
-
-@router.post("/generate")
-async def generate_with_id(setting_id : int, input_text: str, background_task : BackgroundTasks, request_id: RequestId, db_session: DbSession):
-    # ws = await ws_manager.get(request_id)
-    background_task.add_task(generate_image_task, input_text, setting_id, request_id, db_session)
-    return {"message": "Generation started", "request_id": request_id}

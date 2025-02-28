@@ -3,7 +3,8 @@ import logging
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
+
 
 from src.api.call.models import CallRead, CallCreate, CallRequset
 from .services import get, create

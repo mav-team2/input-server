@@ -11,9 +11,6 @@ class WebSocketManager:
         await websocket.accept()
         self.active_connections[session_id] = websocket
 
-    # async def get(self, session_id: str) -> WebSocket:
-    #     return self.active_connections[session_id]
-
     async def disconnect(self, session_id: str):
         if session_id in self.active_connections:
             del self.active_connections[session_id]

@@ -1,5 +1,3 @@
-import uuid
-
 from fastapi import FastAPI, status
 
 import logging
@@ -7,11 +5,9 @@ import logging
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
-from starlette.requests import Request
 
 from src.api.router import api_router
 from src.api.core.log import configure_logging
-from src.api.core.dependency import _request_id_ctx_var
 
 log = logging.getLogger(__name__)
 
@@ -52,13 +48,6 @@ app = FastAPI(
     exception_handlers={404: not_found}
 )
 
-@app.middleware("http")
-async def add_request_id_to_context(request: Request, call_next):
-    request_id = str(uuid.uuid4())
-    token = _request_id_ctx_var.set(request_id)
-    response = await call_next(request)
-    _request_id_ctx_var.reset(token)  # 요청이 끝나면 request_id 초기화
-    return response
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],

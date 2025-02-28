@@ -1,9 +1,11 @@
+import asyncio
 import logging
-from typing import Any, Union
+from typing import Any, Union, Annotated
 
+from fastapi import Depends
 from pydantic import BaseModel
 from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_scoped_session, async_sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, declared_attr
 
@@ -138,6 +140,17 @@ else:
     )
 
 Base = declarative_base(cls=CustomBase)
+
+async def get_db() -> AsyncSession:
+    session = async_scoped_session(async_sessionmaker(bind=engine), scopefunc=asyncio.current_task)
+    # log.debug("current session: %s", session)
+    try:
+        yield session
+    finally:
+        await session.remove()
+
+
+DbSession = Annotated[Union[Session, AsyncSession], Depends(get_db)]
 
 
 def resolve_table_name(name):

@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette import status
 
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
 from src.api.history.models import History, HistoryCreate, HistoryUpdate
 
 log = logging.getLogger(__name__)

@@ -25,7 +25,7 @@ class HistoryBase(MyBaseModel):
     is_success : bool
 
 class HistoryCreate(HistoryBase):
-    is_success = False
+    is_success : bool = False
 
 class HistoryUpdate(MyBaseModel):
     is_success: bool

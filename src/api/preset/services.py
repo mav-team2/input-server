@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette import status
 
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
 from src.api.preset.models import Preset, PresetCreate, PresetUpdate
 
 log = logging.getLogger(__name__)

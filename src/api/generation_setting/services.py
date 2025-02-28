@@ -3,10 +3,9 @@ from typing import Optional, Sequence
 
 from fastapi import HTTPException
 from sqlalchemy import select, update as _update
-from sqlalchemy.orm import selectinload
 from starlette import status
 
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
 from src.api.generation_setting.models import GenerationSetting, GenerationSettingCreate, GenerationSettingUpdate
 
 log = logging.getLogger(__name__)
@@ -16,7 +15,7 @@ async def get(db_session: DbSession, generation_setting_id: int) -> Optional[Gen
     return (await db_session.execute(
         select(GenerationSetting)
         .where(GenerationSetting.id == generation_setting_id)
-        .options(selectinload(GenerationSetting.preset_id), selectinload(GenerationSetting.assistant_id))
+        # .options(selectinload(GenerationSetting.preset_id), selectinload(GenerationSetting.assistant_id))
     )).scalar()
 
 

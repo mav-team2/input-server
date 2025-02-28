@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
 from src.api.preset.models import PresetRead, PresetCreate, PresetUpdate
 from src.api.preset.services import get, create, get_all, update, delete
 

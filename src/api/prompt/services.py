@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
 from src.api.prompt.chatGPT.chatGPTGenerator import ChatGPTHandler
 from src.api.prompt.models import Assistant, AssistantCreate
 

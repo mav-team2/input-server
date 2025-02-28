@@ -1,8 +1,8 @@
 # python
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, status
 from typing import List
 
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
 from src.api.history.models import HistoryRead, HistoryCreate, HistoryUpdate
 from src.api.history.services import (
     get,

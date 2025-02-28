@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Query
 
 from src.api.call.models import Call, CallCreate
-from src.api.core.dependency import DbSession
+from src.api.database.core import DbSession
 
 log = logging.getLogger(__name__)
 
