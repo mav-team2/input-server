@@ -1,9 +1,7 @@
-aio-pika==9.4.3
 aiomysql==0.2.0
 aiormq==6.8.1
 alembic==1.13.3
 annotated-types==0.7.0
-anyio==4.6.2.post1
 certifi==2024.8.30
 cffi==1.17.1
 click==8.1.7

@@ -1,7 +1,7 @@
 import logging
 import enum
 
-from src.api.config import LOG_LEVEL
+from src.api.core.config import LOG_LEVEL
 
 
 LOG_FORMAT_DEBUG = "%(levelname)s:%(message)s:%(pathname)s:%(funcName)s:%(lineno)d"

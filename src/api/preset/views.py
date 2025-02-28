@@ -1,14 +1,12 @@
-import json
 import logging
 from typing import List
 
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from src.api.database.core import DbSession
-# from src.api.database.services import CommonParameters, search_filter_sort_paginate
-from src.api.presets.models import PresetRead, PresetCreate, PresetUpdate
-from src.api.presets.services import get, create, get_all, update, delete
+from src.api.core.dependency import DbSession
+from src.api.preset.models import PresetRead, PresetCreate, PresetUpdate
+from src.api.preset.services import get, create, get_all, update, delete
 
 router = APIRouter()
 
@@ -17,7 +15,7 @@ log = logging.getLogger(__name__)
 
 @router.get("/", response_model=List[PresetRead])
 async def get_presets(db_session: DbSession):
-    """Get all presets."""
+    """Get all preset."""
     return await get_all(db_session=db_session)
 
 

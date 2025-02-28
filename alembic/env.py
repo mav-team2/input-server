@@ -1,8 +1,11 @@
 import asyncio
 from logging.config import fileConfig
 
-from src.api.presets.models import Preset
-from src.api.call.models import Call
+from src.api.preset.models import Preset
+# from src.api.call.models import Call
+from src.api.generation_setting.models import GenerationSetting
+from src.api.history.models import History
+from src.api.prompt.models import Assistant
 
 from alembic import context
 

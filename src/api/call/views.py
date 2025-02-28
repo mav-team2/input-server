@@ -1,19 +1,16 @@
 import logging
-import uuid
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from src.api.database.core import DbSession
-# from src.api.database.services import CommonParameters, search_filter_sort_paginate
+from src.api.core.dependency import DbSession
 
 from src.api.call.models import CallRead, CallCreate, CallRequset
 from .services import get, create
-from src.api.presets.services import get as get_preset
-from src.api import config
-from ..prompt.chatGPT.chatGPTGenerator import OpenAIHandlerDependency
-from ..prompt.services import create_prompt
-from ..queue.rabbitmq_client import rabbitMQClient
+from src.api.preset.services import get as get_preset
+from ..core import config
+from src.api.prompt.chatGPT.chatGPTGenerator import OpenAIHandlerDependency
+from src.api.prompt.services import create_prompt
 
 # from ..queue.connection import rabbitMQClient
 

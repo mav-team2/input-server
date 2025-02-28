@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Type, Sequence
+from typing import Optional, Sequence
 
 from fastapi import HTTPException
 from sqlalchemy import select, update as _update, delete as _delete
@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette import status
 
-from src.api.database.core import DbSession
-from src.api.presets.models import Preset, PresetCreate, PresetUpdate
+from src.api.core.dependency import DbSession
+from src.api.preset.models import Preset, PresetCreate, PresetUpdate
 
 log = logging.getLogger(__name__)
 

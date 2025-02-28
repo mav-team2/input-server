@@ -48,15 +48,19 @@ DEFAULT_STATIC_DIR = os.path.join(
 STATIC_DIR = config("STATIC_DIR", default=DEFAULT_STATIC_DIR)
 
 # database
-DATABASE_HOSTNAME = config("DATABASE_HOSTNAME")
+DATABASE_HOSTNAME = config("DATABASE_HOSTNAME", default=None)
 DATABASE_USER = config("DATABASE_USER", default="root")
-DATABASE_PASSWORD = config("DATABASE_PASSWORD")
+DATABASE_PASSWORD = config("DATABASE_PASSWORD", default=None)
 DATABASE_NAME = config("DATABASE_NAME", default="api")
 DATABASE_PORT = config("DATABASE_PORT", default="3306")
 DATABASE_ENGINE_POOL_SIZE = config("DATABASE_ENGINE_POOL_SIZE", cast=int, default=20)
 DATABASE_ENGINE_MAX_OVERFLOW = config("DATABASE_ENGINE_MAX_OVERFLOW", cast=int, default=0)
-DATABASE_URL = f"mysql+aiomysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}"
+# DATABASE_URL = f"mysql+aiomysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}"
 
+if DATABASE_HOSTNAME:
+    DATABASE_URL = f"mysql+aiomysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}"
+else:
+    DATABASE_URL = config("DATABASE_URL", default="sqlite+aiosqlite:///./test.db")
 
 # Deal with DB disconnects
 # https://docs.sqlalchemy.org/en/20/core/pooling.html#pool-disconnects
@@ -94,10 +98,4 @@ if os.path.exists(vector_key_file):
         VECTOR_STORE_IDS = file.read().splitlines()
 else:
     VECTOR_STORE_IDS = config("VECTOR_STORE_IDS", cast=CommaSeparatedStrings, default=None)
-
-RABBITMQ_URL = config("RABBITMQ_URL")
-RABBITMQ_EXCHANGE = config("RABBITMQ_EXCHANGE")
-RABBITMQ_ROUTING_KEY = config("RABBITMQ_ROUTING_KEY")
-RABBITMQ_QUEUE = config("RABBITMQ_QUEUE")
-
 

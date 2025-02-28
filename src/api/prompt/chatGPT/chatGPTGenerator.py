@@ -1,14 +1,12 @@
 import logging
-import os
 import asyncio
-from typing import Optional, List, Any, Annotated
+from typing import Optional, Annotated
 
 import openai
 from fastapi import Depends
 from openai.types.beta.threads import Run
-from openai.types.beta.thread_create_params import Message
 
-from src.api import config
+from src.api.core import config
 
 log = logging.getLogger(__name__)
 
@@ -99,6 +97,25 @@ class ChatGPTHandler:
             # interval 시간만큼 대기 후 다시 상태 체크
             await asyncio.sleep(interval)
 
+    async def call(self, prompt: str, assistant_id: str):
+        try:
+            assistant = await self.retrieve_assistant(assistant_id)
+            if assistant is None:
+                raise Exception("Assistant not found")
+
+            thread = await self.create_thread()
+            await self.create_message(prompt, thread.id)
+            run = await self.create_run(thread.id, assistant_id)
+            await self.handle_run_completion(thread.id, run.id)
+            messages = await self.list_messages(thread.id)
+            response = messages.data[0].content[0].text.value
+            return response
+        except Exception as e:
+            log.error(f"OPENAI Error: {e}")
+            raise e
+        finally:
+            await self.remove_thread(thread.id)
+            log.info("Thread removed")
 
 async def get_openai_handler() -> ChatGPTHandler:
     api_key = config.OPENAI_API_KEY

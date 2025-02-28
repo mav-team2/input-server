@@ -1,9 +1,9 @@
 import logging
 from typing import Optional
 
-from .chatGPT.chatGPTGenerator import ChatGPTHandler
-from .models import AssistantId, AssistantIdCreate
-from ..database.core import DbSession
+from src.api.core.dependency import DbSession
+from src.api.prompt.chatGPT.chatGPTGenerator import ChatGPTHandler
+from src.api.prompt.models import Assistant, AssistantCreate
 
 log = logging.getLogger(__name__)
 
@@ -38,13 +38,13 @@ async def create_prompt(prompt: str, assistant_id: str, handler: ChatGPTHandler)
 
 
 # CRUD assistant_id
-async def get_assistant_id(db_session: DbSession, assistant_id: int) -> Optional[AssistantId]:
+async def get_assistant_id(db_session: DbSession, assistant_id: int) -> Optional[Assistant]:
     # return db_session.query(AssistantId).get(assistant_id)
-    return await db_session.get(AssistantId, assistant_id)
+    return await db_session.get(Assistant, assistant_id)
 
 
-async def create_assistant_id(db_session: DbSession, assistant_id_in: AssistantIdCreate) -> AssistantId:
-    assistant_id = AssistantId(**assistant_id_in.model_dump())
+async def create_assistant_id(db_session: DbSession, assistant_id_in: AssistantCreate) -> Assistant:
+    assistant_id = Assistant(**assistant_id_in.model_dump())
     db_session.add(assistant_id)
     await db_session.commit()
     await db_session.refresh(assistant_id)
@@ -52,6 +52,6 @@ async def create_assistant_id(db_session: DbSession, assistant_id_in: AssistantI
 
 
 async def delete_assistant_id(db_session: DbSession, assistant_id_id: int):
-    assistant_id = await db_session.get(AssistantId, assistant_id_id)
+    assistant_id = await db_session.get(Assistant, assistant_id_id)
     await db_session.delete(assistant_id)
     await db_session.commit()

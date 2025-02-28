@@ -35,8 +35,6 @@ class MyBaseModel(BaseModel):
             SecretStr: lambda v: v.get_secret_value() if v else None,
         }
 
-
-
 class Pagination(MyBaseModel):
     itemsPerPage: int
     page: int

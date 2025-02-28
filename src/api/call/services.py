@@ -2,10 +2,10 @@ import logging
 from typing import Optional, Type
 
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload, Query
+from sqlalchemy.orm import Query
 
 from src.api.call.models import Call, CallCreate
-from src.api.database.core import DbSession
+from src.api.core.dependency import DbSession
 
 log = logging.getLogger(__name__)
 

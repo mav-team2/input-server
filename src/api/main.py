@@ -1,20 +1,17 @@
-from contextlib import asynccontextmanager
-from contextvars import ContextVar
-from typing import Final, Optional, Union, Any
+import uuid
+
 from fastapi import FastAPI, status
 
-import os
 import logging
 
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
-from starlette.routing import compile_path
 
 from src.api.router import api_router
-from .log import configure_logging
-from .queue.rabbitmq_client import rabbitMQClient
+from src.api.core.log import configure_logging
+from src.api.core.dependency import _request_id_ctx_var
 
 log = logging.getLogger(__name__)
 
@@ -47,53 +44,25 @@ async def not_found(request, exc):
     )
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    log.debug("Starting rabbitmq connection")
-    try:
-        await rabbitMQClient.start()
-        yield
-
-    except BaseException as e:
-        log.error("Error connecting rabbitmq: %s", e)
-
-    finally:
-        if rabbitMQClient.is_connected:
-            await rabbitMQClient.stop()
-
-
 app = FastAPI(
     title="Input API for Diffusion Image Models",
     description="This API is used to send images to the Diffusion Image Models.",
     openapi_url="/docs/openapi.json",
     redoc_url="/redoc",
-    exception_handlers={404: not_found},
-    lifespan=lifespan
+    exception_handlers={404: not_found}
 )
+
+@app.middleware("http")
+async def add_request_id_to_context(request: Request, call_next):
+    request_id = str(uuid.uuid4())
+    token = _request_id_ctx_var.set(request_id)
+    response = await call_next(request)
+    _request_id_ctx_var.reset(token)  # 요청이 끝나면 request_id 초기화
+    return response
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
                    allow_headers=["*"])
-
-
-def get_path_params_from_request(request: Request) -> Union[dict[Any, Any], dict[str, Union[str, Any]]]:
-    path_params = {}
-    for r in api_router.routes:
-        path_regex, path_format, param_converters = compile_path(r.path)
-        path = request["path"].removeprefix("/api/v1")  # remove the /api/v1 for matching
-        match = path_regex.match(path)
-        if match:
-            path_params = match.groupdict()
-    return path_params
-
-
-REQUEST_ID_CTX_KEY: Final[str] = "request_id"
-_request_id_ctx_var: ContextVar[Optional[str]] = ContextVar(REQUEST_ID_CTX_KEY, default=None)
-
-
-def get_request_id() -> Optional[str]:
-    return _request_id_ctx_var.get()
-
 
 app.include_router(api_router, prefix="/api")
 

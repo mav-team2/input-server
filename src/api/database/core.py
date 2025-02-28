@@ -1,16 +1,13 @@
-import asyncio
 import logging
-from typing import Annotated, Any, Union
+from typing import Any, Union
 
-from fastapi import Depends
 from pydantic import BaseModel
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessionmaker, AsyncSession, \
-    async_scoped_session
+from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, declared_attr
+from sqlalchemy.orm import Session, declared_attr
 
-from src.api import config
+from src.api.core import config
 from src.api.database.exceptions import NotFoundError
 
 log = logging.getLogger(__name__)
@@ -125,10 +122,6 @@ class CustomBase:
             " " + self._repr_attrs_str if self._repr_attrs_str else "",
         )
 
-
-Base = declarative_base(cls=CustomBase)
-
-
 if config.ENV == 'local':
     engine = create_async_engine(
         config.LOCAL_DATABASE_URL,
@@ -139,23 +132,12 @@ if config.ENV == 'local':
 else:
     engine = create_async_engine(
         config.DATABASE_URL,
-        pool_size=config.DATABASE_ENGINE_POOL_SIZE,
-        max_overflow=config.DATABASE_ENGINE_MAX_OVERFLOW,
-        pool_pre_ping=config.DATABASE_ENGINE_POOL_PING,
+        # pool_size=config.DATABASE_ENGINE_POOL_SIZE,
+        # max_overflow=config.DATABASE_ENGINE_MAX_OVERFLOW,
+        # pool_pre_ping=config.DATABASE_ENGINE_POOL_PING,
     )
 
-
-async def get_db() -> AsyncSession:
-    session = async_scoped_session(async_sessionmaker(bind=engine), scopefunc=asyncio.current_task)
-    # log.debug("current session: %s", session)
-
-    try:
-        yield session
-    finally:
-        await session.remove()
-
-
-DbSession = Annotated[Union[Session, AsyncSession], Depends(get_db)]
+Base = declarative_base(cls=CustomBase)
 
 
 def resolve_table_name(name):
@@ -170,7 +152,7 @@ def get_model_name_by_tablename(table_fullname: str) -> str:
 
 
 def get_class_by_tablename(table_fullname: str) -> Any:
-    """Return class reference mapped to table."""
+    """Return class reference mapped to tpip able."""
 
     def _find_class(name):
         for c in Base.registry._class_registry.values():

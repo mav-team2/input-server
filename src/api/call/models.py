@@ -1,12 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, String, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Integer
 
 from src.api.database.core import Base
-from src.api.models import MyBaseModel, TimeStampMixin
-from src.api.presets.models import PresetBase
+from src.api.database.models import MyBaseModel, TimeStampMixin
 
 
 class Call(Base, TimeStampMixin):
@@ -16,12 +14,12 @@ class Call(Base, TimeStampMixin):
     # uuid = Column(String(36), nullable=False, unique=True, index=True, comment="UUID")
     # user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     input_prompt = Column(String(1000), nullable=False, comment="입력 프롬프트")
-    preset_id = Column(Integer, ForeignKey("presets.id"), nullable=False)
+    # preset_id = Column(Integer, ForeignKey("preset.id"), nullable=False)
     prompt = Column(String(1000), nullable=False, comment="생성 프롬프트")
 
     # History와 User, Preset의 관계 설정
     # user = relationship("User", back_populates="call")
-    preset = relationship("Preset", back_populates="calls")
+    # preset = relationship("Preset", back_populates="calls")
     # result = relationship("Result", back_populates="call")
 
 
