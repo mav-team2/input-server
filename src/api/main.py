@@ -15,25 +15,6 @@ log = logging.getLogger(__name__)
 configure_logging()
 log.warn("current log level: %s", logging.getLogger().getEffectiveLevel())
 
-"""
-로컬 서버에서 최대한 많은 기능을 덜어낸다.
-api server에선 콜 기록만 저장
-프롬프트와 call uuid, api type을 통째로 queue에 전송
-gpt api는 워커로 빼두기
-"""
-
-"""
-app
- - api
-    - auth
-    - prompts
-    - preset(admin)
-    - history(admin)
-    - queueManger(admnin)
- - front
-"""
-
-
 async def not_found(request, exc):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND, content={"detail": [{"msg": "Not Found."}]}
